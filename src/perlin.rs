@@ -1,6 +1,6 @@
 // PerlinNoise gen taken from https://github.com/processing-js/processing-js/blob/master/src/P5Functions/Math.js
-
-use rand::prelude::*;
+use rand::{Rng, SeedableRng};
+use rand::rngs::SmallRng;
 
 /// Perlin Noise generator that outputs 1/2/3D Perlin noise
 #[derive(Clone)]
@@ -13,7 +13,7 @@ pub struct PerlinNoise {
 impl PerlinNoise {
     pub fn new() -> PerlinNoise {
         let mut perm = [0; 512];
-        let mut rng = thread_rng();
+        let mut rng = SmallRng::seed_from_u64(1);
 
         for i in 0..256 {
             perm[i] = i;
@@ -84,13 +84,13 @@ impl PerlinNoise {
     }
 
     fn noise3d(&self, mut x: f64, mut y: f64, mut z: f64) -> f64 {
-        let x0 = (x.floor() as usize) & 255;
-        let y0 = (y.floor() as usize) & 255;
-        let z0 = (z.floor() as usize) & 255;
+        let x0 = (libm::floor(x) as usize) & 255;
+        let y0 = (libm::floor(y) as usize) & 255;
+        let z0 = (libm::floor(z) as usize) & 255;
 
-        x -= x.floor();
-        y -= y.floor();
-        z -= z.floor();
+        x -= libm::floor(x);
+        y -= libm::floor(y);
+        z -= libm::floor(z);
 
         let fx = (3.0 - 2.0 * x) * x * x;
         let fy = (3.0 - 2.0 * y) * y * y;
@@ -135,11 +135,11 @@ impl PerlinNoise {
     }
 
     fn noise2d(&self, mut x: f64, mut y: f64) -> f64 {
-        let x0 = (x.floor() as usize) & 255;
-        let y0 = (y.floor() as usize) & 255;
+        let x0 = (libm::floor(x) as usize) & 255;
+        let y0 = (libm::floor(y) as usize) & 255;
 
-        x -= x.floor();
-        y -= y.floor();
+        x -= libm::floor(x);
+        y -= libm::floor(y);
 
         let fx = (3.0 - 2.0 * x) * x * x;
         let fy = (3.0 - 2.0 * y) * y * y;
@@ -162,9 +162,9 @@ impl PerlinNoise {
     }
 
     fn noise1d(&self, mut x: f64) -> f64 {
-        let x0 = (x.floor() as usize) & 255;
+        let x0 = (libm::floor(x) as usize) & 255;
 
-        x -= x.floor();
+        x -= libm::floor(x);
 
         let fx = (3.0 - 2.0 * x) * x * x;
         lerp(

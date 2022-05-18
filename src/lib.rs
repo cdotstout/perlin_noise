@@ -15,8 +15,10 @@
 //!  
 //!
 //!
+#![no_std]
 
 extern crate rand;
+extern crate libm;
 
 mod perlin;
 
