@@ -7,7 +7,7 @@ use rand::rngs::SmallRng;
 pub struct PerlinNoise {
     perm: [usize; 512],
     octaves: usize,
-    fallout: f64,
+    fallout: f32,
 }
 
 impl PerlinNoise {
@@ -39,7 +39,7 @@ impl PerlinNoise {
     }
 
     /// Perlin Noise in 3D
-    pub fn get3d(&self, args: [f64; 3]) -> f64 {
+    pub fn get3d(&self, args: [f32; 3]) -> f32 {
         let mut effect = 1.0;
         let mut k = 1.0;
         let mut sum = 0.0;
@@ -53,7 +53,7 @@ impl PerlinNoise {
         sum
     }
     /// Perlin Noise in 2D
-    pub fn get2d(&self, args: [f64; 2]) -> f64 {
+    pub fn get2d(&self, args: [f32; 2]) -> f32 {
         let mut effect = 1.0;
         let mut k = 1.0;
         let mut sum = 0.0;
@@ -69,7 +69,7 @@ impl PerlinNoise {
     }
 
     /// Perlin Noise in 1D
-    pub fn get(&self, x: f64) -> f64 {
+    pub fn get(&self, x: f32) -> f32 {
         let mut effect = 1.0;
         let mut k = 1.0;
         let mut sum = 0.0;
@@ -83,14 +83,14 @@ impl PerlinNoise {
         sum
     }
 
-    fn noise3d(&self, mut x: f64, mut y: f64, mut z: f64) -> f64 {
-        let x0 = (libm::floor(x) as usize) & 255;
-        let y0 = (libm::floor(y) as usize) & 255;
-        let z0 = (libm::floor(z) as usize) & 255;
+    pub fn noise3d(&self, mut x: f32, mut y: f32, mut z: f32) -> f32 {
+        let x0 = (libm::floorf(x) as usize) & 255;
+        let y0 = (libm::floorf(y) as usize) & 255;
+        let z0 = (libm::floorf(z) as usize) & 255;
 
-        x -= libm::floor(x);
-        y -= libm::floor(y);
-        z -= libm::floor(z);
+        x -= libm::floorf(x);
+        y -= libm::floorf(y);
+        z -= libm::floorf(z);
 
         let fx = (3.0 - 2.0 * x) * x * x;
         let fy = (3.0 - 2.0 * y) * y * y;
@@ -134,12 +134,12 @@ impl PerlinNoise {
         )
     }
 
-    fn noise2d(&self, mut x: f64, mut y: f64) -> f64 {
-        let x0 = (libm::floor(x) as usize) & 255;
-        let y0 = (libm::floor(y) as usize) & 255;
+    fn noise2d(&self, mut x: f32, mut y: f32) -> f32 {
+        let x0 = (libm::floorf(x) as usize) & 255;
+        let y0 = (libm::floorf(y) as usize) & 255;
 
-        x -= libm::floor(x);
-        y -= libm::floor(y);
+        x -= libm::floorf(x);
+        y -= libm::floorf(y);
 
         let fx = (3.0 - 2.0 * x) * x * x;
         let fy = (3.0 - 2.0 * y) * y * y;
@@ -161,10 +161,10 @@ impl PerlinNoise {
         )
     }
 
-    fn noise1d(&self, mut x: f64) -> f64 {
-        let x0 = (libm::floor(x) as usize) & 255;
+    fn noise1d(&self, mut x: f32) -> f32 {
+        let x0 = (libm::floorf(x) as usize) & 255;
 
-        x -= libm::floor(x);
+        x -= libm::floorf(x);
 
         let fx = (3.0 - 2.0 * x) * x * x;
         lerp(
@@ -175,7 +175,7 @@ impl PerlinNoise {
     }
 }
 
-fn grad3d(hash: usize, x: f64, y: f64, z: f64) -> f64 {
+fn grad3d(hash: usize, x: f32, y: f32, z: f32) -> f32 {
     let h = hash & 15;
 
     let u = if h < 8 { x } else { y };
@@ -195,7 +195,7 @@ fn grad3d(hash: usize, x: f64, y: f64, z: f64) -> f64 {
     v + u
 }
 
-fn grad2d(hash: usize, x: f64, y: f64) -> f64 {
+fn grad2d(hash: usize, x: f32, y: f32) -> f32 {
     let v = if hash & 1 == 0 { x } else { y };
 
     if (hash & 1) == 0 {
@@ -205,7 +205,7 @@ fn grad2d(hash: usize, x: f64, y: f64) -> f64 {
     }
 }
 
-fn grad1d(hash: usize, x: f64) -> f64 {
+fn grad1d(hash: usize, x: f32) -> f32 {
     if (hash & 1) == 0 {
         -x
     } else {
@@ -214,7 +214,7 @@ fn grad1d(hash: usize, x: f64) -> f64 {
 }
 
 // Linear Interpolate
-fn lerp(t: f64, a: f64, b: f64) -> f64 {
+fn lerp(t: f32, a: f32, b: f32) -> f32 {
     a + t * (b - a)
 }
 // Fade function as defined by Ken Perlin.  This eases coordinate values
